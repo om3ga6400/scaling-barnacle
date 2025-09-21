@@ -111,7 +111,12 @@ function calculateDPS(stats) {
 
   const magSize = utils.parseMag(stats.ammo);
   if (magSize === 1) return dmg;
-  return (dmg * rpm) / 60;
+
+  const roundsPerSecond = rpm / 60;
+
+  const effectiveRoundsPerSecond = Math.min(roundsPerSecond, magSize);
+
+  return dmg * effectiveRoundsPerSecond;
 }
 
 const createObjective = (label, better, scoreKey, formatter = null) => ({
@@ -135,32 +140,19 @@ const createObjective = (label, better, scoreKey, formatter = null) => ({
 });
 
 const OBJECTIVES = {
-  damage_max: createObjective("Highest damage (max)", "desc", "damage_max", formatDamageWithPellets),
-  damage_max_low: createObjective("Lowest damage (max)", "asc", "damage_max", formatDamageWithPellets),
-  damage_min: createObjective("Highest damage (min)", "desc", "damage_min", formatDamageWithPellets),
-  damage_min_low: createObjective("Lowest damage (min)", "asc", "damage_min", formatDamageWithPellets),
-  firerate: createObjective("Fastest firerate", "desc", "firerate"),
-  firerate_slow: createObjective("Slowest firerate", "asc", "firerate"),
-  dps: createObjective("Best DPS", "desc", "dps", (v) => v != null ? `${Math.round(v).toLocaleString()} DPS` : "—"),
-  dps_low: createObjective("Worst DPS", "asc", "dps", (v) => v != null ? `${Math.round(v).toLocaleString()} DPS` : "—"),
-  accuracy: createObjective("Best hip fire accuracy", "desc", "hip_fire_accuracy", (v) => v != null ? `${v}%` : "—"),
-  accuracy_low: createObjective("Worst hip fire accuracy", "asc", "hip_fire_accuracy", (v) => v != null ? `${v}%` : "—"),
-  ads_accuracy: createObjective("Best ads accuracy", "desc", "ads_accuracy", (v) => v != null ? `${v}%` : "—"),
-  ads_accuracy_low: createObjective("Worst ads accuracy", "asc", "ads_accuracy", (v) => v != null ? `${v}%` : "—"),
-  recoil: createObjective("Lowest recoil", "asc", "recoil_combined"),
-  recoil_high: createObjective("Highest recoil", "desc", "recoil_combined"),
-  reload_partial: createObjective("Fastest reload (with ammo)", "asc", "reload_speed_partial", (v) => v != null ? `${v}s` : "—"),
-  reload_partial_slow: createObjective("Slowest reload (with ammo)", "desc", "reload_speed_partial", (v) => v != null ? `${v}s` : "—"),
-  reload_empty: createObjective("Fastest reload (empty)", "asc", "reload_speed_empty", (v) => v != null ? `${v}s` : "—"),
-  reload_empty_slow: createObjective("Slowest reload (empty)", "desc", "reload_speed_empty", (v) => v != null ? `${v}s` : "—"),
-  equip: createObjective("Fastest equip", "asc", "equip_speed", (v) => v != null ? `${v}s` : "—"),
-  equip_slow: createObjective("Slowest equip", "desc", "equip_speed", (v) => v != null ? `${v}s` : "—"),
-  aim: createObjective("Fastest aim", "asc", "aim_speed", (v) => v != null ? `${v}s` : "—"),
-  aim_slow: createObjective("Slowest aim", "desc", "aim_speed", (v) => v != null ? `${v}s` : "—"),
-  weight: createObjective("Lightest weight", "asc", "weight", (v) => v != null ? `${v}` : "—"),
-  weight_heavy: createObjective("Heaviest weight", "desc", "weight", (v) => v != null ? `${v}` : "—"),
-  ammo: createObjective("Largest mag", "desc", "mag_size"),
-  ammo_small: createObjective("Smallest mag", "asc", "mag_size")
+  damage_max: createObjective("Damage (max)", "desc", "damage_max", formatDamageWithPellets),
+  damage_min: createObjective("Damage (min)", "desc", "damage_min", formatDamageWithPellets),
+  firerate: createObjective("Firerate", "desc", "firerate"),
+  dps: createObjective("DPS", "desc", "dps", (v) => v != null ? `${Math.round(v).toLocaleString()} DPS` : "—"),
+  accuracy: createObjective("Hip fire accuracy", "desc", "hip_fire_accuracy", (v) => v != null ? `${v}%` : "—"),
+  ads_accuracy: createObjective("ADS accuracy", "desc", "ads_accuracy", (v) => v != null ? `${v}%` : "—"),
+  recoil: createObjective("Recoil", "asc", "recoil_combined"),
+  reload_partial: createObjective("Reload (with ammo)", "asc", "reload_speed_partial", (v) => v != null ? `${v}s` : "—"),
+  reload_empty: createObjective("Reload (empty)", "asc", "reload_speed_empty", (v) => v != null ? `${v}s` : "—"),
+  equip: createObjective("Equip speed", "asc", "equip_speed", (v) => v != null ? `${v}s` : "—"),
+  aim: createObjective("Aim speed", "asc", "aim_speed", (v) => v != null ? `${v}s` : "—"),
+  weight: createObjective("Weight", "asc", "weight", (v) => v != null ? `${v}` : "—"),
+  ammo: createObjective("Mag size", "desc", "mag_size")
 };
 
 const formatScore = (objKey, val, gunName = null) => {
