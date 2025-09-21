@@ -62,7 +62,7 @@ const GUNS = [
     "SR-2M",
     "Steyr Elite",
     "TMP",
-    "TumorGrowth",
+    "Tumor Growth",
     "UMP-45",
     "USP Match",
     "USP MK23",
@@ -84,8 +84,6 @@ const GUNS = [
     "Nail Gun",
     "Olympia",
     "PP2000",
-    "Range Finder",
-    "Riot Shield",
     "Saiga 12K",
     "SCAR-H",
     "Scorpion EVO",
@@ -96,21 +94,21 @@ const GUNS = [
 ];
 
 export const WEAPON_CATEGORIES = {
-    "Assault Rifles": {
+    "Rifles": {
         type: "rifle",
-        weapons: ["AK-15", "AK-47", "AR-10", "AR-15", "AUG A3", "Bryson Repeater", "FAMAS G2", "G36C", "G3A3", "HK416", "Honey Badger", "HW Spear", "L85A2", "M1 Garand", "M16A2", "M4 Carbine", "MCX LVAW", "MK 17 CQC", "RFB", "SKS", "SOPMOD Block II", "FN FAL", "Groza-4", "SCAR-H", "SG-552 Commando"]
+        weapons: ["AK-15", "AK-47", "AR-10", "AR-15", "AUG A3", "Bryson Repeater", "FAMAS G2", "G36C", "G3A3", "HK416", "Honey Badger", "HW Spear", "L85A2", "M1 Garand", "M16A2", "M4 Carbine", "MCX LVAW", "MK 17 CQC", "RFB", "Saddlegun", "SKS", "SOPMOD Block II", "FN FAL", "Groza-4", "SCAR-H", "SG-552 Commando"]
     },
     "SMGs": {
         type: "smg",
-        weapons: ["AS VAL", "HW Jolt", "MAC-10", "MP40", "MP5A2", "MP5K", "MP7", "MPX", "P90", "PPSH-41", "SR-2M", "TMP", "UMP-45", "Uzi", "PP2000", "KRISS Vector", "Scorpion EVO"]
+        weapons: ["AS VAL", "HW Jolt", "MP40", "MP5A2", "MP5K", "MP7", "MPX", "P90", "PPSH-41", "SR-2M", "TMP", "UMP-45", "Uzi", "PP2000", "KRISS Vector", "Scorpion EVO"]
     },
-    "Sniper Rifles": {
+    "Snipers": {
         type: "sniper",
         weapons: ["CheyTac M200", "Dragunov SVD", "JNG-90", "L96A1", "Lee Enfield", "MK-11", "QBU-88", "QBZ-95", "R700 Hunter", "Steyr Elite", "Barrett M82A3", "Walther WA2000"]
     },
     "Shotguns": {
         type: "shotgun",
-        weapons: ["Pipe Shotgun", "Remington 870", "Saddlegun", "Double Barrel", "Ithaca 37 Stakeout", "M26 MASS", "Olympia", "Saiga 12K", "SPAS-12", "UTS-15"]
+        weapons: ["Pipe Shotgun", "Remington 870", "Double Barrel", "Ithaca 37 Stakeout", "M26 MASS", "Olympia", "Saiga 12K", "SPAS-12", "UTS-15", "HW Pulper"]
     },
     "LMGs": {
         type: "rifle",
@@ -118,11 +116,11 @@ export const WEAPON_CATEGORIES = {
     },
     "Pistols": {
         type: "pistol",
-        weapons: ["CZ-75", "Desert Eagle", "Five SeveN", "HW Cappa", "M1911", "M9", "Magnum Revolver", "Makarov", "MP443", "P226", "Ruger MK2", "USP Match", "USP MK23", "Luger P08", "UNICA 6"]
+        weapons: ["CZ-75", "Desert Eagle", "Five SeveN", "HW Cappa", "M1911", "M9", "Magnum Revolver", "Makarov", "MP443", "P226", "Ruger MK2", "USP Match", "USP MK23", "Luger P08", "UNICA 6", "Cowboy Gun", "MAC-10"]
     },
     "Special": {
         type: "",
-        weapons: ["TumorGrowth", "Classic Pistol", "Cowboy Gun", "Fail", "HW Pulper", "Model 1777 Musket", "Nail Gun", "Range Finder", "Riot Shield"]
+        weapons: ["Tumor Growth", "Classic Pistol", "Fail", "Model 1777 Musket", "Nail Gun"]
     }
 };
 
