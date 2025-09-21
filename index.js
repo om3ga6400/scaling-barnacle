@@ -63,7 +63,12 @@ const elements = {
 
 const utils = {
   toNum: v => (v === null || v === undefined || v === "") ? null : Number.isFinite(Number(v)) ? Number(v) : null,
-  parseMag: text => text && typeof text === "string" ? (text.match(/\d+/)?.[0] ? Number(text.match(/\d+/)[0]) : null) : null,
+  parseMag: text => {
+    if (!text || typeof text !== "string") return null;
+    if (text.toLowerCase() === "inf") return Infinity;
+    const match = text.match(/\d+/);
+    return match ? Number(match[0]) : null;
+  },
   isDamageRelatedObjective: objKey => objKey.includes("damage") || objKey.includes("dps"),
   isShotgun: weaponName => WEAPON_CATEGORIES["Shotguns"].weapons.includes(weaponName),
   createElement: (tag, className, innerHTML = "") => {
@@ -114,7 +119,7 @@ function calculateDPS(stats) {
 
   const roundsPerSecond = rpm / 60;
 
-  const effectiveRoundsPerSecond = Math.min(roundsPerSecond, magSize);
+  const effectiveRoundsPerSecond = (magSize === Infinity) ? roundsPerSecond : Math.min(roundsPerSecond, magSize);
 
   return dmg * effectiveRoundsPerSecond;
 }
