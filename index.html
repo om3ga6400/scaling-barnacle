@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <header>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Search guns (e.g., AK-47, MP5K, Desert Eagle)..." />
+      <div class="controls">
+        <select id="objective" aria-label="Ranking objective">
+          <option value="dps" selected>Highest DPS</option>
+          <option value="dps_low">Lowest DPS</option>
+          <option value="damage_max">Highest max damage</option>
+          <option value="damage_max_low">Lowest max damage</option>
+          <option value="damage_min">Highest min damage</option>
+          <option value="damage_min_low">Lowest min damage</option>
+          <option value="firerate">Fastest firerate</option>
+          <option value="firerate_slow">Slowest firerate</option>
+          <option value="accuracy">Best hip fire accuracy</option>
+          <option value="accuracy_low">Worst hip fire accuracy</option>
+          <option value="ads_accuracy">Best ADS accuracy</option>
+          <option value="ads_accuracy_low">Worst ADS accuracy</option>
+          <option value="recoil">Lowest recoil</option>
+          <option value="recoil_high">Highest recoil</option>
+          <option value="reload_partial">Fastest reload (with ammo)</option>
+          <option value="reload_partial_slow">Slowest reload (with ammo)</option>
+          <option value="reload_empty">Fastest reload (empty)</option>
+          <option value="reload_empty_slow">Slowest reload (empty)</option>
+          <option value="equip">Fastest equip</option>
+          <option value="equip_slow">Slowest equip</option>
+          <option value="aim">Fastest aim</option>
+          <option value="aim_slow">Slowest aim</option>
+          <option value="weight">Lightest weight</option>
+          <option value="weight_heavy">Heaviest weight</option>
+          <option value="ammo">Largest mag</option>
+          <option value="ammo_small">Smallest mag</option>
+        </select>
+        <select id="gunType" aria-label="Gun type filter">
+          <option value="">All types</option>
+          <option value="pistol">Pistols</option>
+          <option value="rifle">Rifles</option>
+          <option value="smg">SMGs</option>
+          <option value="sniper">Snipers</option>
+          <option value="shotgun">Shotguns</option>
+        </select>
+        <select id="bodyPart" aria-label="Body part for damage calculations" style="display: none;">
+          <option value="base">Base damage</option>
+          <option value="head">Head damage</option>
+          <option value="torso">Torso damage</option>
+          <option value="limb">Limb damage</option>
+        </select>
+        <input id="weightLimit" type="text" placeholder="Max weight" aria-label="Maximum weight filter" />
+      </div>
+    </div>
+  </header>
+  <main>
+    <section id="topPicks" class="picks"></section>
+    <section id="comparison" class="comparison-section">
+      <div class="comparison-header">
+        <h3>Weapon Comparison</h3>
+        <div class="comparison-selectors">
+          <select id="weapon1" aria-label="Select first weapon">
+            <option value="">Select Weapon 1</option>
+          </select>
+          <span class="vs">VS</span>
+          <select id="weapon2" aria-label="Select second weapon">
+            <option value="">Select Weapon 2</option>
+          </select>
+        </div>
+      </div>
+      <div id="comparisonResults" class="comparison-results"></div>
+    </section>
+    <div id="grid" class="grid"></div>
+  </main>
+  <script type="module" src="index.js"></script>
+</body>
+
+</html>
