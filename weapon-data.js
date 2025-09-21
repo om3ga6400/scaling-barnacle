@@ -119,7 +119,7 @@ export const WEAPON_CATEGORIES = {
         weapons: ["CZ-75", "Desert Eagle", "Five SeveN", "HW Cappa", "M1911", "M9", "Magnum Revolver", "Makarov", "MP443", "P226", "Ruger MK2", "USP Match", "USP MK23", "Luger P08", "UNICA 6", "Cowboy Gun", "MAC-10"]
     },
     "Special": {
-        type: "",
+        type: "special",
         weapons: ["Tumor Growth", "Classic Pistol", "Fail", "Model 1777 Musket", "Nail Gun"]
     }
 };
@@ -212,4 +212,5 @@ export const WEAPON_STATS = {
     "PP2000": { damage_max: 20, damage_min: 15, damage_falloff_start: 100, max_bullet_range: 225, firerate: 760, hip_fire_accuracy: 80, ads_accuracy: 160, vertical_recoil: 0.25, horizontal_recoil: 0.28, head_multiplier: 6, torso_multiplier: 1.5, limb_multiplier: 1, reload_speed_partial: 2, reload_speed_empty: 2.7, equip_speed: 0.4, aim_speed: 0.25, weight: 3, ammo: "40+1" },
     "Saiga 12K": { damage_max: 1, damage_min: 1, pellet_count: 30, damage_falloff_start: 75, max_bullet_range: 200, firerate: 500, hip_fire_accuracy: 15, ads_accuracy: 18.75, vertical_recoil: 0.65, horizontal_recoil: 0.8, head_multiplier: 10, torso_multiplier: 5, limb_multiplier: 5, reload_speed_partial: 2.8, reload_speed_empty: 3.3, equip_speed: 0.6, aim_speed: 0.35, weight: 8, ammo: "5+1" },
 };
+
 
