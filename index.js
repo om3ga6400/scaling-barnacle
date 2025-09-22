@@ -32,7 +32,7 @@ const STATS = [
 
 const $id = id => document.getElementById(id);
 const elements = {
-  grid: $id('grid'), 
+  grid: $id('grid'),
   search: $id('search'),
   objective: $id('objective'),
   weightLimit: $id('weightLimit'),
@@ -44,10 +44,10 @@ const elements = {
 };
 
 const el = (tag, cls = '', html = '') => {
-  const node = document.createElement(tag);
-  if (cls) node.className = cls;
-  if (html) node.innerHTML = html;
-  return node;
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (html) n.innerHTML = html;
+  return n;
 };
 
 const toNumber = v => (v === null || v === undefined || v === '') ? null : (Number.isFinite(Number(v)) ? Number(v) : null);
@@ -59,24 +59,6 @@ const parseMag = txt => {
 };
 
 const isDamageObjective = key => !!key && (key.includes('damage') || key.includes('dps'));
-
-const tooltipEl = (() => {
-  const t = el('div', 'tooltip-popover');
-  Object.assign(t.style, { position: 'fixed', display: 'none', pointerEvents: 'none' });
-  document.body.appendChild(t);
-  return t;
-})();
-const showTooltipHtml = (html, x, y) => { if (!html) return; tooltipEl.innerHTML = String(html).trim(); tooltipEl.style.left = x + 12 + 'px'; tooltipEl.style.top = y + 12 + 'px'; tooltipEl.style.display = 'block'; };
-const moveTooltip = (x, y) => { tooltipEl.style.left = x + 12 + 'px'; tooltipEl.style.top = y + 12 + 'px'; };
-const hideTooltip = () => { tooltipEl.style.display = 'none'; };
-
-function addTooltipListeners(node, html) {
-  if (!html || !node) return;
-  node.addEventListener('mouseenter', e => showTooltipHtml(html, e.clientX, e.clientY));
-  node.addEventListener('mousemove', e => moveTooltip(e.clientX, e.clientY));
-  node.addEventListener('mouseleave', () => hideTooltip());
-}
-
 const GUNS = Object.values(WEAPON_CATEGORIES).flatMap(c => c.weapons || []);
 const GUN_TYPES = Object.entries(WEAPON_CATEGORIES).reduce((map, [catName, catData]) => {
   const type = catData.type;
@@ -92,7 +74,7 @@ const GUN_TYPES = Object.entries(WEAPON_CATEGORIES).reduce((map, [catName, catDa
   return map;
 }, {});
 
-const EMPTY_STATS = STATS.reduce((acc, s) => (acc[s.key] = null, acc), {});
+const EMPTY_STATS = STATS.reduce((acc, s) => { acc[s.key] = null; return acc; }, {});
 const GUN_STATS = Object.fromEntries(GUNS.map(name => [name, { ...EMPTY_STATS, ...(WEAPON_STATS[name] || {}) }]));
 
 function damageForBodyPart(stats = {}, damageKey = 'damage_max', body = 'base', pelletOverride = null) {
@@ -105,52 +87,30 @@ function damageForBodyPart(stats = {}, damageKey = 'damage_max', body = 'base', 
   return total * mult;
 }
 
-function formatStatValue(key, value, stats = {}) {
-  return (value == null) ? '—' : String(value);
+function formatStatValue(key, value) {
+  if (value == null) return '—';
+  if (key === 'firerate') return String(value) + ' RMP';
+  return String(value);
+}
+const formatDamageWithPellets = v => (v == null ? '—' : String(Math.round(v)));
+
+function isShotgun(name) {
+  return Array.isArray(WEAPON_CATEGORIES['Shotguns']?.weapons) && WEAPON_CATEGORIES['Shotguns'].weapons.includes(name);
 }
 
-function formatDamageWithPellets(value, stats) {
-  return (value == null) ? '—' : String(Math.round(value));
-}
-
-function makeDamageTooltip(stats = {}, damageKey = 'damage_max', name = null) {
-  if (isShotgun(name)) return '';
-  const pellets = toNumber(stats?.pellet_count) || 1;
-  const per = toNumber(stats?.damage_max) ?? toNumber(stats?.damage_min);
-  if (per == null) return '';
-  const effectivePellets = (damageKey === 'damage_min' && isShotgun(name)) ? 1 : pellets;
-  if (pellets <= 1 && effectivePellets <= 1) return '';
-  const total = per * effectivePellets;
-  return `<div>${Math.round(total)} (${per} × ${effectivePellets})</div>`;
-}
-
-function computeDPSDetails(stats = {}) {
+const computeDPSDetails = stats => {
   // DIOS = D * P * min(A, F)
-  // A = ammo, F = fire rate (bullets/sec), P = projectiles per bullet, D = damage/bullet, DIOS = damage in one second
   const body = elements.bodyPart?.value || 'base';
   const rpm = toNumber(stats.firerate);
-  const damageMax = toNumber(stats.damage_max);
-  if (rpm == null || damageMax == null) return null;
-
-  const pellets = toNumber(stats.pellet_count) || 1;
+  if (rpm == null || toNumber(stats.damage_max) == null) return null;
   const mag = parseMag(stats.ammo);
-
   const rps = rpm / 60;
   const perShotFull = damageForBodyPart(stats, 'damage_max', body);
-  const shotsInOneSecond = (Number.isFinite(rps) ? rps : 0);
+  const shotsInOneSecond = Number.isFinite(rps) ? rps : 0;
   const shotsLimitedByAmmo = Number.isFinite(mag) ? Math.min(mag, shotsInOneSecond) : shotsInOneSecond;
-
   const dios = perShotFull != null ? perShotFull * shotsLimitedByAmmo : null;
-
-  return {
-    dios,
-    shotsPerSecond: shotsLimitedByAmmo,
-    mag,
-    perShotFull,
-    pellets
-  };
-}
-
+  return { dios, shotsPerSecond: shotsLimitedByAmmo, mag, perShotFull };
+};
 const computeDPSScore = stats => { const d = computeDPSDetails(stats); return d ? d.dios : null; };
 
 const lowerIsBetterStats = new Set(['vertical_recoil', 'horizontal_recoil', 'reload_speed_partial', 'reload_speed_empty', 'equip_speed', 'aim_speed', 'weight']);
@@ -184,8 +144,8 @@ const OBJECTIVES = {
     const diosStr = d.dios != null ? Math.round(d.dios).toLocaleString() : '—';
     return `${diosStr} DIOS · ${shots} shots/s · mag ${mag}`;
   }),
-  accuracy: makeObjective('Hip fire accuracy', 'desc', 'hip_fire_accuracy', v => (v != null ? `${v}%` : '—')),
-  ads_accuracy: makeObjective('ADS accuracy', 'desc', 'ads_accuracy', v => (v != null ? `${v}%` : '—')),
+  ads_accuracy: makeObjective('ADS accuracy', 'desc', 'ads_accuracy', v => (v != null ? `${v}` : '—')),
+  hip_accuracy: makeObjective('Hip fire accuracy', 'desc', 'hip_fire_accuracy', v => (v != null ? `${v}` : '—')),
   recoil: makeObjective('Recoil', 'asc', 'recoil_combined'),
   reload_partial: makeObjective('Reload (with ammo)', 'asc', 'reload_speed_partial', v => (v != null ? `${v}s` : '—')),
   reload_empty: makeObjective('Reload (empty)', 'asc', 'reload_speed_empty', v => (v != null ? `${v}s` : '—')),
@@ -199,10 +159,10 @@ function formatScore(objKey, val, gunName = null) {
   const fmt = OBJECTIVES[objKey]?.format;
   if (fmt) return fmt(val, gunName ? GUN_STATS[gunName] : null);
   if (val == null) return '—';
-  return (typeof val === 'number') ? (val % 1 === 0 ? String(val) : val.toFixed(2)) : String(val);
+  const base = (typeof val === 'number') ? (val % 1 === 0 ? String(val) : val.toFixed(2)) : String(val);
+  if (objKey === 'firerate') return base + ' RMP';
+  return base;
 }
-
-const isShotgun = name => Array.isArray(WEAPON_CATEGORIES['Shotguns']?.weapons) && WEAPON_CATEGORIES['Shotguns'].weapons.includes(name);
 
 function renderGunCard(name) {
   const stats = GUN_STATS[name] || {};
@@ -212,15 +172,12 @@ function renderGunCard(name) {
   card.querySelector('.title span').textContent = name;
   const statsEl = card.querySelector('.stats');
   STATS.forEach(s => {
-    if (s.type === 'separator') { const sep = document.createElement('div'); sep.className = 'stat-separator'; statsEl.appendChild(sep); return; }
+    if (s.type === 'separator') { statsEl.appendChild(el('div', 'stat-separator')); return; }
     if (s.key === 'pellet_count' && !isShotgun(name)) return;
-    const row = document.createElement('div'); row.className = 'field';
-    const label = document.createElement('label'); label.textContent = s.label || '';
-    const value = document.createElement('div'); value.className = 'value'; value.textContent = formatStatValue(s.key, stats[s.key], stats) ?? '—';
-    if (s.key === 'damage_max' || s.key === 'damage_min') {
-      const tip = makeDamageTooltip(stats, s.key, name);
-      addTooltipListeners(row, tip);
-    }
+    const row = el('div', 'field');
+    const label = el('label', '', s.label || '');
+    const value = el('div', 'value', formatStatValue(s.key, stats[s.key], stats) ?? '—');
+  
     row.append(label, value);
     statsEl.appendChild(row);
   });
@@ -246,7 +203,6 @@ function renderAll(filteredWeapons) {
     const list = (data.weapons || []).filter(w => filteredWeapons.includes(w));
     if (list.length) byCategory[cat] = list;
   });
-
   const frag = document.createDocumentFragment();
   Object.entries(byCategory).forEach(([cat, weapons]) => {
     const tmpl = document.getElementById('tmpl-category-section');
@@ -277,7 +233,7 @@ function renderTopPicks(filteredWeapons) {
   const heading = el('div', 'heading'); heading.appendChild(el('span', 'label', 'Rankings:')); heading.appendChild(el('span', '', obj.label));
   const right = el('div', ''); right.style.marginLeft = 'auto'; if (ranked.length > 5) { const btn = el('button', 'expand-btn', showAll ? 'Show Top 5' : 'Show All'); btn.addEventListener('click', toggleTopPicks); right.appendChild(btn); }
   heading.appendChild(right);
-  const pickList = document.createElement('div'); pickList.className = 'pick-list';
+  const pickList = el('div', 'pick-list');
   const pickTmpl = document.getElementById('tmpl-pick');
   list.forEach((p, i) => {
     const node = pickTmpl.content.cloneNode(true);
@@ -292,15 +248,11 @@ function renderTopPicks(filteredWeapons) {
       scoreEl.textContent = diosStr;
       const mag = d.mag === Infinity ? '∞' : (d.mag == null ? '—' : String(d.mag));
       const shots = d.shotsPerSecond != null ? (Math.round(d.shotsPerSecond * 100) / 100) : '—';
-      const tooltipHtml = `\n        <div><strong>${diosStr}</strong></div>\n        <div>Shots/s used: ${shots}</div>\n        <div>Mag: ${mag}</div>\n      `;
-      const dmgTip = makeDamageTooltip(GUN_STATS[p.name] || {}, 'damage_max', p.name) + makeDamageTooltip(GUN_STATS[p.name] || {}, 'damage_min', p.name);
-      const fullTip = tooltipHtml + dmgTip;
-      addTooltipListeners(item, fullTip);
+  
     } else {
       const txt = formatScore(objKey, p.score, p.name);
       scoreEl.textContent = txt;
-      const dmgTip = makeDamageTooltip(GUN_STATS[p.name] || {}, 'damage_max', p.name) + makeDamageTooltip(GUN_STATS[p.name] || {}, 'damage_min', p.name);
-      addTooltipListeners(item, `<div>${txt}</div>` + dmgTip);
+  
     }
     pickList.appendChild(item);
   });
@@ -318,7 +270,7 @@ function getCompareValue(stat, value, stats) {
 }
 
 function renderComparison(w1, w2, s1, s2) {
-  const grid = document.createElement('div'); grid.className = 'comparison-grid';
+  const grid = el('div', 'comparison-grid');
   const cmpTmpl = document.getElementById('tmpl-comparison-weapon');
   const nodeA = cmpTmpl.content.cloneNode(true);
   const nodeB = cmpTmpl.content.cloneNode(true);
@@ -348,27 +300,19 @@ function renderComparison(w1, w2, s1, s2) {
 
     const a = el('div', classA);
     a.appendChild(el('span', '', stat.label || ''));
-    const aVal = el('span', '', d1);
-    if (stat.key === 'damage_max' || stat.key === 'damage_min') {
-      const tip = makeDamageTooltip(s1, stat.key, w1);
-      addTooltipListeners(a, tip);
-    }
-    a.appendChild(aVal);
+  const aVal = el('span', '', d1);
+  a.appendChild(aVal);
 
     const b = el('div', classB);
     b.appendChild(el('span', '', stat.label || ''));
-    const bVal = el('span', '', d2);
-    if (stat.key === 'damage_max' || stat.key === 'damage_min') {
-      const tip = makeDamageTooltip(s2, stat.key, w2);
-      addTooltipListeners(b, tip);
-    }
-    b.appendChild(bVal);
+  const bVal = el('span', '', d2);
+  b.appendChild(bVal);
 
     colA.appendChild(a);
     colB.appendChild(b);
   });
 
-  grid.append(colA, document.createElement('div'), colB);
+  grid.append(colA, el('div'), colB);
   elements.comparisonResults.innerHTML = '';
   elements.comparisonResults.appendChild(grid);
   elements.comparisonResults.classList.add('active');
@@ -386,12 +330,12 @@ function compareWeapons() {
 
 function makeGroupedSelect(placeholder) {
   const select = document.createElement('select');
-  const empty = document.createElement('option'); empty.value = ''; empty.textContent = placeholder; select.appendChild(empty);
+  const empty = el('option'); empty.value = ''; empty.textContent = placeholder; select.appendChild(empty);
   Object.entries(WEAPON_CATEGORIES).forEach(([cat, data]) => {
     if (!(data.weapons || []).length) return;
     const g = document.createElement('optgroup'); g.label = cat;
     (data.weapons || []).slice().sort().forEach(w => {
-      const o = document.createElement('option'); o.value = w; o.textContent = w; g.appendChild(o);
+      const o = el('option'); o.value = w; o.textContent = w; g.appendChild(o);
     });
     select.appendChild(g);
   });
@@ -416,7 +360,7 @@ function updateDisplay() {
 }
 
 function toggleTopPicks() {
-  const container = document.getElementById('topPicks');
+  const container = $id('topPicks');
   container.dataset.expanded = (container.dataset.expanded === 'true') ? 'false' : 'true';
   updateDisplay();
 }

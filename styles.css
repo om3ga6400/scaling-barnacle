@@ -187,22 +187,6 @@ input[type="text"] {
   font-size: var(--font-size-xs);
 }
 
-.tooltip-popover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border);
-  padding: 0.25rem 0.4rem;
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
-  width: -moz-fit-content;
-  width: fit-content;
-  white-space: normal;
-  z-index: 9999;
-  display: inline-block;
-  box-shadow: none;
-  font-family: inherit;
-}
-
 .weapon-category {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
