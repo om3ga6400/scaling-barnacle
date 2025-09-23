@@ -51,28 +51,22 @@ const el = (tag, cls = '', html = '') => {
 };
 
 const toNumber = v => (v === null || v === undefined || v === '') ? null : (Number.isFinite(Number(v)) ? Number(v) : null);
-const parseMag = txt => {
-  if (txt === '' || txt == null) return null;
-  if (typeof txt === 'string' && txt.toLowerCase() === 'inf') return Infinity;
-  const m = String(txt).match(/\d+/);
-  return m ? Number(m[0]) : null;
-};
+const parseMag = txt => txt == null || txt === '' ? null : (String(txt).toLowerCase() === 'inf' ? Infinity : (String(txt).match(/\d+/) || [null])[0] && Number((String(txt).match(/\d+/) || [null])[0]));
 
 const isDamageObjective = key => !!key && (key.includes('damage') || key.includes('dps'));
 const GUNS = Object.values(WEAPON_CATEGORIES).flatMap(c => c.weapons || []);
-const GUN_TYPES = Object.entries(WEAPON_CATEGORIES).reduce((map, [catName, catData]) => {
+const GUN_TYPES = Object.fromEntries(Object.entries(WEAPON_CATEGORIES).flatMap(([catName, catData]) => {
   const type = catData.type;
-  (catData.weapons || []).forEach(w => {
+  return (catData.weapons || []).map(w => {
     let t = type;
     if (catName === 'Special') {
       const name = String(w).toLowerCase();
       if (name.includes('pistol')) t = 'pistol';
       else if (name.includes('musket')) t = 'rifle';
     }
-    map[w] = t;
+    return [w, t];
   });
-  return map;
-}, {});
+}));
 
 const EMPTY_STATS = STATS.reduce((acc, s) => { acc[s.key] = null; return acc; }, {});
 const GUN_STATS = Object.fromEntries(GUNS.map(name => [name, { ...EMPTY_STATS, ...(WEAPON_STATS[name] || {}) }]));
@@ -99,35 +93,42 @@ function isShotgun(name) {
 }
 
 const computeDPSDetails = stats => {
-  // DIOS = D * P * min(A, F)
+  // Damage in One Second (DIOS)
+  // D * P * min(A, F)
+  // A = ammo (total bullets available)
+  // F = fire rate (bullets/second)
+  // D = base damage per projectile (no multipliers)
+  // P = projectiles per bullet (shotgun pellets)
   const body = elements.bodyPart?.value || 'base';
   const rpm = toNumber(stats.firerate);
   if (rpm == null || toNumber(stats.damage_max) == null) return null;
   const mag = parseMag(stats.ammo);
-  const rps = rpm / 60;
+  const shotsPerSecond = rpm / 60;
   const perShotFull = damageForBodyPart(stats, 'damage_max', body);
-  const shotsInOneSecond = Number.isFinite(rps) ? rps : 0;
-  const shotsLimitedByAmmo = Number.isFinite(mag) ? Math.min(mag, shotsInOneSecond) : shotsInOneSecond;
-  const dios = perShotFull != null ? perShotFull * shotsLimitedByAmmo : null;
-  return { dios, shotsPerSecond: shotsLimitedByAmmo, mag, perShotFull };
+  const shots = Number.isFinite(shotsPerSecond) ? shotsPerSecond : 0;
+  const limitedShots = Number.isFinite(mag) ? Math.min(mag, shots) : shots;
+  return { dios: perShotFull != null ? perShotFull * limitedShots : null, shotsPerSecond: limitedShots, mag, perShotFull };
 };
-const computeDPSScore = stats => { const d = computeDPSDetails(stats); return d ? d.dios : null; };
+const computeDPSScore = stats => (computeDPSDetails(stats) || {}).dios ?? null;
 
 const lowerIsBetterStats = new Set(['vertical_recoil', 'horizontal_recoil', 'reload_speed_partial', 'reload_speed_empty', 'equip_speed', 'aim_speed', 'weight']);
 
 function makeObjective(label, better, key, formatter = null) {
   const score = (s, gunName = null) => {
-    if (key === 'damage_max' || key === 'damage_min') {
-      const pelletOverride = (key === 'damage_min' && isShotgun(gunName)) ? 1 : null;
-      return damageForBodyPart(s, key, elements.bodyPart?.value || 'base', pelletOverride);
+    switch (key) {
+      case 'damage_max':
+      case 'damage_min': {
+        const pelletOverride = (key === 'damage_min' && isShotgun(gunName)) ? 1 : null;
+        return damageForBodyPart(s, key, elements.bodyPart?.value || 'base', pelletOverride);
+      }
+      case 'dps': return computeDPSScore(s);
+      case 'recoil_combined': {
+        const v = toNumber(s.vertical_recoil), h = toNumber(s.horizontal_recoil);
+        return (v == null || h == null) ? null : Math.hypot(v, h);
+      }
+      case 'mag_size': return parseMag(s.ammo);
+      default: return toNumber(s[key]);
     }
-    if (key === 'dps') return computeDPSScore(s);
-    if (key === 'recoil_combined') {
-      const v = toNumber(s.vertical_recoil), h = toNumber(s.horizontal_recoil);
-      return (v == null || h == null) ? null : Math.hypot(v, h);
-    }
-    if (key === 'mag_size') return parseMag(s.ammo);
-    return toNumber(s[key]);
   };
   return { label, better, score, format: formatter };
 }
@@ -224,14 +225,22 @@ function renderTopPicks(filteredWeapons) {
   const objKey = elements.objective.value;
   const obj = OBJECTIVES[objKey];
   if (!obj) { container.innerHTML = ''; return; }
-  const ranked = filteredWeapons.map(name => ({ name, score: obj.score(GUN_STATS[name] || {}, name) })).filter(x => x.score != null);
+  const ranked = filteredWeapons
+    .map(name => ({ name, score: obj.score(GUN_STATS[name] || {}, name) }))
+    .filter(x => x.score != null);
   if (!ranked.length) { container.innerHTML = `<div class="heading"><span class="label">Rankings:</span><span class="muted">No data for selected objective.</span></div>`; return; }
   ranked.sort((a, b) => (obj.better === 'asc' ? a.score - b.score : b.score - a.score));
   const showAll = container.dataset.expanded === 'true';
   const list = showAll ? ranked : ranked.slice(0, 5);
   container.innerHTML = '';
-  const heading = el('div', 'heading'); heading.appendChild(el('span', 'label', 'Rankings:')); heading.appendChild(el('span', '', obj.label));
-  const right = el('div', ''); right.style.marginLeft = 'auto'; if (ranked.length > 5) { const btn = el('button', 'expand-btn', showAll ? 'Show Top 5' : 'Show All'); btn.addEventListener('click', toggleTopPicks); right.appendChild(btn); }
+  const heading = el('div', 'heading');
+  heading.append(el('span', 'label', 'Rankings:'), el('span', '', obj.label));
+  const right = el('div', ''); right.style.marginLeft = 'auto';
+  if (ranked.length > 5) {
+    const btn = el('button', 'expand-btn', showAll ? 'Show Top 5' : 'Show All');
+    btn.addEventListener('click', toggleTopPicks);
+    right.appendChild(btn);
+  }
   heading.appendChild(right);
   const pickList = el('div', 'pick-list');
   const pickTmpl = document.getElementById('tmpl-pick');
@@ -241,18 +250,10 @@ function renderTopPicks(filteredWeapons) {
     item.querySelector('.name').textContent = `${i + 1}. ${p.name}`;
     const scoreEl = item.querySelector('.score');
     if (objKey === 'dps') {
-      const stats = GUN_STATS[p.name] || {};
-      const d = computeDPSDetails(stats) || {};
-      const diosVal = d.dios ?? null;
-      const diosStr = diosVal != null ? Math.round(diosVal).toLocaleString() + ' DIOS' : '—';
-      scoreEl.textContent = diosStr;
-      const mag = d.mag === Infinity ? '∞' : (d.mag == null ? '—' : String(d.mag));
-      const shots = d.shotsPerSecond != null ? (Math.round(d.shotsPerSecond * 100) / 100) : '—';
-  
+      const d = computeDPSDetails(GUN_STATS[p.name] || {}) || {};
+      scoreEl.textContent = d.dios != null ? Math.round(d.dios).toLocaleString() + ' DIOS' : '—';
     } else {
-      const txt = formatScore(objKey, p.score, p.name);
-      scoreEl.textContent = txt;
-  
+      scoreEl.textContent = formatScore(objKey, p.score, p.name);
     }
     pickList.appendChild(item);
   });
@@ -270,7 +271,6 @@ function getCompareValue(stat, value, stats) {
 }
 
 function renderComparison(w1, w2, s1, s2) {
-  const grid = el('div', 'comparison-grid');
   const cmpTmpl = document.getElementById('tmpl-comparison-weapon');
   const nodeA = cmpTmpl.content.cloneNode(true);
   const nodeB = cmpTmpl.content.cloneNode(true);
@@ -295,36 +295,81 @@ function renderComparison(w1, w2, s1, s2) {
       else { betterA = cv1 < cv2; betterB = cv2 < cv1; }
     }
 
-    const classA = `comparison-stat ${betterA ? 'better' : ''}`.trim();
-    const classB = `comparison-stat ${betterB ? 'better' : ''}`.trim();
+    const classA = `comparison-stat ${betterA ? 'better' : ''} ${(!betterA && betterB) ? 'worse' : ''}`.trim();
+    const classB = `comparison-stat ${betterB ? 'better' : ''} ${(!betterB && betterA) ? 'worse' : ''}`.trim();
 
     const a = el('div', classA);
     a.appendChild(el('span', '', stat.label || ''));
-  const aVal = el('span', '', d1);
-  a.appendChild(aVal);
+    const aVal = el('span', '', d1);
+    a.appendChild(aVal);
 
     const b = el('div', classB);
     b.appendChild(el('span', '', stat.label || ''));
-  const bVal = el('span', '', d2);
-  b.appendChild(bVal);
+    const bVal = el('span', '', d2);
+    b.appendChild(bVal);
 
     colA.appendChild(a);
     colB.appendChild(b);
   });
 
-  grid.append(colA, el('div'), colB);
+  const wrapper = el('div', 'comparison-grid');
+  wrapper.style.position = 'relative';
   elements.comparisonResults.innerHTML = '';
-  elements.comparisonResults.appendChild(grid);
+  elements.comparisonResults.appendChild(wrapper);
   elements.comparisonResults.classList.add('active');
+
+  const placeColumns = () => {
+    const isMobile = (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+    [colA, colB].forEach(c => {
+      c.style.position = '';
+      c.style.left = '';
+      c.style.top = '';
+      c.style.width = '';
+    });
+
+    const sel1Rect = elements.weapon1Select.getBoundingClientRect();
+    const sel2Rect = elements.weapon2Select.getBoundingClientRect();
+    const wrapRect = wrapper.getBoundingClientRect();
+
+    wrapper.appendChild(colA);
+    wrapper.appendChild(colB);
+
+    const left1 = Math.max(0, Math.round(sel1Rect.left - wrapRect.left));
+    const left2 = Math.max(0, Math.round(sel2Rect.left - wrapRect.left));
+    const w1 = Math.max(0, Math.round(sel1Rect.width));
+    const w2 = Math.max(0, Math.round(sel2Rect.width));
+
+    wrapper.style.minHeight = Math.max(colA.offsetHeight, colB.offsetHeight) + 'px';
+
+    colA.style.position = 'absolute';
+    colA.style.left = left1 + 'px';
+    colA.style.top = '0px';
+    colA.style.width = w1 + 'px';
+
+    colB.style.position = 'absolute';
+    colB.style.left = left2 + 'px';
+    colB.style.top = '0px';
+    colB.style.width = w2 + 'px';
+  };
+
+  if (elements.comparisonResults._resizeListener) {
+    window.removeEventListener('resize', elements.comparisonResults._resizeListener);
+    delete elements.comparisonResults._resizeListener;
+  }
+  const onResize = () => { if (!elements.comparisonResults.classList.contains('active')) return; placeColumns(); };
+  window.addEventListener('resize', onResize);
+  elements.comparisonResults._resizeListener = onResize;
+
+  requestAnimationFrame(placeColumns);
 }
 
 function compareWeapons() {
   const w1 = elements.weapon1Select.value;
   const w2 = elements.weapon2Select.value;
-  if (!w1 || !w2) { elements.comparisonResults.classList.remove('active'); return; }
+  if (!w1 || !w2) { hideComparison(); return; }
   const s1 = GUN_STATS[w1];
   const s2 = GUN_STATS[w2];
-  if (!s1 || !s2) { elements.comparisonResults.classList.remove('active'); return; }
+  if (!s1 || !s2) { hideComparison(); return; }
   renderComparison(w1, w2, s1, s2);
 }
 

@@ -1,12 +1,13 @@
 :root {
-  --bg-primary: #1e1e2e;
-  --bg-secondary: #313244;
-  --bg-tertiary: #181825;
-  --border: #45475a;
-  --text-primary: #cdd6f4;
-  --text-muted: #a6adc8;
-  --accent: #b4befe;
-  --success: #a6e3a1;
+  --bg-primary: #1e1e2e;      /* base */
+  --bg-secondary: #313244;    /* surface0 */
+  --bg-tertiary: #181825;     /* mantle */
+  --border: #45475a;          /* surface1 */
+  --text-primary: #cdd6f4;    /* text */
+  --text-muted: #a6adc8;      /* subtext1 */
+  --accent: #cba6f7;          /* mauve */
+  --success: #a6e3a1;         /* green */
+  --danger: #f38ba8;          /* red */
   
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
@@ -35,7 +36,7 @@ html, body {
   padding: 0;
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: system-ui, sans-serif;
+  font-family: system-ui;
 }
 
 header {
@@ -58,12 +59,10 @@ input, select {
   background: var(--bg-secondary);
   color: var(--text-primary);
   outline: none;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 input:focus, select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--border);
 }
 
 input::placeholder {
@@ -276,6 +275,7 @@ input[type="text"] {
 
 .comparison-results {
   display: none;
+  position: relative;
 }
 
 .comparison-results.active {
@@ -283,10 +283,10 @@ input[type="text"] {
 }
 
 .comparison-grid {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   gap: var(--spacing-lg);
-  align-items: start;
 }
 
 .comparison-weapon {
@@ -294,12 +294,18 @@ input[type="text"] {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
+  box-sizing: border-box;
 }
 
 .comparison-weapon h4 {
   margin: 0 0 var(--spacing-lg) 0;
   font-weight: 600;
   text-align: center;
+}
+
+.comparison-grid > div:nth-child(2) {
+  width: var(--spacing-lg);
+  flex: 0 0 var(--spacing-lg);
 }
 
 .comparison-stat {
@@ -315,6 +321,13 @@ input[type="text"] {
 
 .comparison-stat.better {
   background: var(--success);
+  color: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.comparison-stat.worse {
+  background: var(--danger);
   color: var(--bg-primary);
   border-radius: var(--radius-sm);
   padding: var(--spacing-xs) var(--spacing-sm);
@@ -362,8 +375,13 @@ input[type="text"] {
   }
   
   .comparison-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: var(--spacing-md);
+  }
+  .comparison-grid > div:nth-child(2) {
+    width: 100%;
+    height: var(--spacing-md);
+    flex: 0 0 var(--spacing-md);
   }
   
   .vs {
