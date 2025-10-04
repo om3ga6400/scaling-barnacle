@@ -1,26 +1,26 @@
 :root {
-  --bg-primary: #1e1e2e;      /* base */
-  --bg-secondary: #313244;    /* surface0 */
-  --bg-tertiary: #181825;     /* mantle */
-  --border: #45475a;          /* surface1 */
-  --text-primary: #cdd6f4;    /* text */
-  --text-muted: #a6adc8;      /* subtext1 */
-  --accent: #cba6f7;          /* mauve */
-  --success: #a6e3a1;         /* green */
-  --danger: #f38ba8;          /* red */
-  
+  --bg-primary: #1e1e2e; /* base */
+  --bg-secondary: #313244; /* surface0 */
+  --bg-tertiary: #181825; /* mantle */
+  --border: #45475a; /* surface1 */
+  --text-primary: #cdd6f4; /* text */
+  --text-muted: #a6adc8; /* subtext1 */
+  --accent: #cba6f7; /* mauve */
+  --success: #a6e3a1; /* green */
+  --danger: #f38ba8; /* red */
+
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 0.75rem;
   --spacing-lg: 1rem;
   --spacing-xl: 1.5rem;
-  
+
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
-  
+
   --transition-fast: 0.2s;
   --transition-normal: 0.3s;
-  
+
   --font-size-xs: 0.75rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.1rem;
@@ -31,7 +31,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   background: var(--bg-primary);
@@ -52,7 +53,8 @@ main {
   padding: var(--spacing-lg);
 }
 
-input, select {
+input,
+select {
   padding: var(--spacing-sm);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -61,7 +63,8 @@ input, select {
   outline: none;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   border-color: var(--accent);
 }
 
@@ -357,7 +360,7 @@ input[type="text"] {
     flex-direction: column;
   }
 
-  input[type="text"], 
+  input[type="text"],
   input[type="search"] {
     width: 100%;
   }
@@ -373,7 +376,7 @@ input[type="text"] {
   .comparison-selectors {
     flex-direction: column;
   }
-  
+
   .comparison-grid {
     flex-direction: column;
     gap: var(--spacing-md);
@@ -383,7 +386,7 @@ input[type="text"] {
     height: var(--spacing-md);
     flex: 0 0 var(--spacing-md);
   }
-  
+
   .vs {
     display: none;
   }
