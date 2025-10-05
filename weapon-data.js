@@ -1,101 +1,103 @@
-const GUNS = [
-  "AK-15",
-  "AK-47",
-  "AG-19",
-  "AR-10",
-  "AR-15",
-  "AS VAL",
-  "AUG A3",
-  "Bryson Repeater",
-  "CZ-75",
-  "Desert Eagle",
-  "Dragunov SVD",
-  "FAMAS G2",
-  "Five SeveN",
-  "G36C",
-  "G3A3",
-  "HK416",
-  "Honey Badger",
-  "HW Cappa",
-  "HW Jolt",
-  "HW Spear",
-  "Intervention",
-  "JNG-90",
-  "L85A2",
-  "L96A1",
-  "Lee Enfield",
-  "Lewis Automatic Rifle",
-  "M1 Garand",
-  "M16A2",
-  "M1911",
-  "M4 Carbine",
-  "M9",
-  "M870",
-  "MAC-10",
-  "Magnum Revolver",
-  "Makarov",
-  "MCX LVAW",
-  "MG4",
-  "MK 17 CQC",
-  "MK-11",
-  "Model 1777 Musket",
-  "MP40",
-  "MP443",
-  "MP5A2",
-  "MP5K",
-  "MP7",
-  "MPX",
-  "P226",
-  "P90",
-  "Pipe Shotgun",
-  "PPSH-41",
-  "Python",
-  "QBU-88",
-  "QBZ-95",
-  "R700 Hunter",
-  "RFB",
-  "RPK",
-  "RPK-74",
-  "Saddlegun",
-  "SG-552 Commando",
-  "SKS",
-  "SOPMOD Block II",
-  "SR-2M",
-  "Steyr Elite",
-  "TMP",
-  "Tumor Growth",
-  "UMP-45",
-  "USP Match",
-  "USP MK23",
-  "Uzi",
-  "RMK2",
-  // Gamepass guns
-  "Barrett M82A3",
-  "Classic Pistol",
-  "Cowboy Gun",
-  "Double Barrel",
-  "Fail",
-  "FN FAL",
-  "Groza-4",
-  "GM6 Lynx",
-  "HW Pulper",
-  "Ithaca 37 Stakeout",
-  "KRISS Vector",
-  "Luger P08",
-  "M1921 Thompson",
-  "M26 MASS",
-  "Nail Gun",
-  "Olympia",
-  "PP2000",
-  "Saiga 12K",
-  "SCAR-H",
-  "Scorpion EVO",
-  "ShAK-12",
-  "SPAS-12",
-  "UNICA 6",
-  "UTS-15",
-  "WA2000",
-];
+/* ========== WEAPON LIST ==========
+AK-15
+AK-47
+AG-19
+AR-10
+AR-15
+AS VAL
+AUG A3
+Bryson Repeater
+CZ-75
+Desert Eagle
+Dragunov SVD
+FAMAS G2
+Five SeveN
+G36C
+G3A3
+HK416
+Honey Badger
+HW Cappa
+HW Jolt
+HW Spear
+Intervention
+JNG-90
+L85A2
+L96A1
+Lee Enfield
+Lewis Automatic Rifle
+M1 Garand
+M16A2
+M1911
+M4 Carbine
+M9
+M870
+MAC-10
+Magnum Revolver
+Makarov
+MCX LVAW
+MG4
+MK 17 CQC
+MK-11
+Model 1777 Musket
+MP40
+MP443
+MP5A2
+MP5K
+MP7
+MPX
+P226
+P90
+Pipe Shotgun
+PPSH-41
+Python
+QBU-88
+QBZ-95
+R700 Hunter
+RFB
+RPK
+RPK-74
+Saddlegun
+SG-552 Commando
+SKS
+SOPMOD Block II
+SR-2M
+Steyr Elite
+TMP
+Tumor Growth
+UMP-45
+USP Match
+USP MK23
+Uzi
+RMK2
+
+========== GAMEPASS GUNS ==========
+
+Barrett M82A3
+Classic Pistol
+Cowboy Gun
+Double Barrel
+Fail
+FN FAL
+Groza-4
+GM6 Lynx
+HW Pulper
+Ithaca 37 Stakeout
+KRISS Vector
+Luger P08
+M1921 Thompson
+M26 MASS
+Nail Gun
+Olympia
+PP2000
+Saiga 12K
+SCAR-H
+Scorpion EVO
+ShAK-12
+SPAS-12
+UNICA 6
+UTS-15
+WA2000
+*/
 
 export const WEAPON_CATEGORIES = {
   Rifles: {

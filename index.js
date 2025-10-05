@@ -176,9 +176,9 @@ function makeObjective(label, better, key, formatter = null) {
 const OBJECTIVES = {
   damage_max: makeObjective("Damage (max)", "desc", "damage_max", formatDamageWithPellets),
   damage_min: makeObjective("Damage (min)", "desc", "damage_min", formatDamageWithPellets),
-  damage_per_shot: makeObjective("Damage per 1-shot", "desc", "damage_per_shot", (v, stats) => (v == null ? "\u2014" : String(Math.round(v)))),
+  damage_per_shot: makeObjective("Damage per 1-shot", "desc", "damage_per_shot", (v, _stats) => (v == null ? "\u2014" : String(Math.round(v)))),
   firerate: makeObjective("Firerate", "desc", "firerate"),
-  dps: makeObjective("DIOS", "desc", "dps", (v, stats) => {
+  dps: makeObjective("DIOS", "desc", "dps", (_v, stats) => {
     const d = computeDPSDetails(stats || {});
     if (!d) return "—";
     const mag = d.mag === Infinity ? "∞" : d.mag == null ? "—" : String(d.mag);
@@ -235,7 +235,6 @@ function getFilteredWeapons() {
     .toLowerCase();
   const maxW = parseFloat(elements.weightLimit.value);
   const type = elements.gunType.value || "";
-  const body = elements.bodyPart?.value || "base";
   return GUNS.filter((name) => {
     if (!name.toLowerCase().includes(q)) return false;
     if (!Number.isNaN(maxW)) {
@@ -386,7 +385,6 @@ function renderComparison(w1, w2, s1, s2) {
   elements.comparisonResults.classList.add("active");
 
   const placeColumns = () => {
-    const isMobile = window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
     [colA, colB].forEach((c) => {
       c.style.position = "";
       c.style.left = "";
@@ -420,14 +418,14 @@ function renderComparison(w1, w2, s1, s2) {
   };
 
   if (elements.comparisonResults._resizeListener) {
-    window.removeEventListener("resize", elements.comparisonResults._resizeListener);
+    globalThis.removeEventListener("resize", elements.comparisonResults._resizeListener);
     delete elements.comparisonResults._resizeListener;
   }
   const onResize = () => {
     if (!elements.comparisonResults.classList.contains("active")) return;
     placeColumns();
   };
-  window.addEventListener("resize", onResize);
+  globalThis.addEventListener("resize", onResize);
   elements.comparisonResults._resizeListener = onResize;
 
   requestAnimationFrame(placeColumns);
@@ -511,7 +509,7 @@ function initEventListeners() {
   elements.weapon2Select.addEventListener("change", compareWeapons);
 }
 
-window.toggleTopPicks = toggleTopPicks;
+globalThis.toggleTopPicks = toggleTopPicks;
 
 populateWeaponDropdowns();
 toggleBodyPartSelector();
