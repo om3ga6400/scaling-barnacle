@@ -1,4 +1,4 @@
-import { WEAPON_CATEGORIES, WEAPON_STATS } from "/data/weapon-data.js";
+import { WEAPON_CATEGORIES, WEAPON_STATS } from "../data/weapon-data.js";
 
 const STATS = [
   { key: "damage_max", label: "damage max" },
