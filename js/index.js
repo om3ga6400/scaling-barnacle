@@ -342,7 +342,7 @@ function renderTopPicks(filteredWeapons) {
   ranked.sort((a, b) => (obj.better === "asc" ? a.score - b.score : b.score - a.score));
 
   const showAll = container.dataset.expanded === "true";
-  const list = showAll ? ranked : ranked.slice(0, 3);
+  const list = showAll ? ranked : ranked.slice(0, 5);
 
   container.innerHTML = "";
 
@@ -352,8 +352,8 @@ function renderTopPicks(filteredWeapons) {
   const right = el("div", "");
   right.style.marginLeft = "auto";
 
-  if (ranked.length > 3) {
-    const btn = el("button", "expand-btn", showAll ? "Show Top 3" : "Show All");
+  if (ranked.length > 5) {
+    const btn = el("button", "expand-btn", showAll ? "Show Top 5" : "Show All");
     btn.addEventListener("click", toggleTopPicks);
     right.appendChild(btn);
   }
