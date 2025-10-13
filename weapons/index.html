@@ -3,9 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="/css/styles.css" />
   </head>
-
   <body>
     <template id="tmpl-card">
       <div class="card">
@@ -15,7 +14,6 @@
         <div class="stats"></div>
       </div>
     </template>
-
     <template id="tmpl-category-section">
       <div class="weapon-category">
         <div class="category-header collapsed">
@@ -27,18 +25,15 @@
         </div>
       </div>
     </template>
-
     <template id="tmpl-pick">
       <div class="pick">
         <span class="name"></span>
         <span class="score"></span>
       </div>
     </template>
-
     <template id="tmpl-comparison-weapon">
       <div class="comparison-weapon"><h4></h4></div>
     </template>
-
     <header>
       <div class="toolbar">
         <input id="search" type="search" placeholder="Search guns (e.g., AK-47, MP5K, Desert Eagle)..." />
@@ -79,24 +74,26 @@
       </div>
     </header>
     <main>
-      <section id="topPicks" class="picks"></section>
-      <section id="comparison" class="comparison-section">
-        <div class="comparison-header">
-          <h3>Weapon Comparison</h3>
-          <div class="comparison-selectors">
-            <select id="weapon1" aria-label="Select first weapon">
-              <option value="">Select Weapon 1</option>
-            </select>
-            <span class="vs">VS</span>
-            <select id="weapon2" aria-label="Select second weapon">
-              <option value="">Select Weapon 2</option>
-            </select>
+      <div class="top-section-container">
+        <section id="topPicks" class="picks"></section>
+        <section id="comparison" class="comparison-section">
+          <div class="comparison-header">
+            <h3>Weapon Comparison</h3>
+            <div class="comparison-selectors">
+              <select id="weapon1" aria-label="Select first weapon">
+                <option value="">Select Weapon 1</option>
+              </select>
+              <span class="vs">VS</span>
+              <select id="weapon2" aria-label="Select second weapon">
+                <option value="">Select Weapon 2</option>
+              </select>
+            </div>
           </div>
-        </div>
-        <div id="comparisonResults" class="comparison-results"></div>
-      </section>
+          <div id="comparisonResults" class="comparison-results"></div>
+        </section>
+      </div>
       <div id="grid" class="grid"></div>
     </main>
-    <script type="module" src="index.js"></script>
+    <script type="module" src="/js/index.js"></script>
   </body>
 </html>
